@@ -1,0 +1,40 @@
+--Procedure
+DELIMITER //
+
+CREATE PROCEDURE GetPostsInThread(IN threadId INT)
+BEGIN
+    SELECT * FROM forum_post
+    WHERE thread_id = threadId;
+END //
+
+DELIMITER ;
+
+--TRIGGER
+DELIMITER //
+CREATE TRIGGER update_forum_post_date
+BEFORE UPDATE ON forum_post
+FOR EACH ROW
+BEGIN
+    IF OLD.content <> NEW.content THEN
+        SET NEW.post_date = NOW();
+    END IF;
+END;
+//
+DELIMITER ;  
+
+UPDATE forum_post SET content = 'Hi' WHERE post_id = 1;
+
+--FUNCTION
+
+DELIMITER //
+
+CREATE FUNCTION GetTotalPosts(userId INT) RETURNS INT DETERMINISTIC
+BEGIN
+    DECLARE postCount INT;
+    SELECT COUNT(*) INTO postCount
+    FROM forum_post
+    WHERE user_id = userId;
+    RETURN postCount;
+END //
+
+DELIMITER ;
